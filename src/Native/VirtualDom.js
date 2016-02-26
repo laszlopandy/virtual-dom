@@ -1410,6 +1410,49 @@ Elm.Native.VirtualDom.make = function(elm)
 		return property('on' + name, eventHandler);
 	}
 
+	function onMount(message) {
+		return {
+			key: '_elm_mount_hook',
+			value: new MountHook(message, null)
+		};
+	}
+
+	function onUnmount(message) {
+		return {
+			key: '_elm_unmount_hook',
+			value: new MountHook(null, message)
+		};
+	}
+
+	function MountHook(mountMessage, unmountMessage)
+	{
+		if (!(this instanceof MountHook))
+		{
+			return new MountHook(mountMessage, unmountMessage);
+		}
+
+		this.mountMessage = mountMessage;
+		this.unmountMessage = unmountMessage;
+	}
+
+	MountHook.prototype.type = 'MountHook';
+
+	MountHook.prototype.hook = function (node, prop, prev)
+	{
+		if (this.mountMessage) {
+			console.log("hook:", node, prop, prev);
+			Signal.sendMessage(this.mountMessage);
+		}
+	};
+
+	MountHook.prototype.unhook = function (node, prop, next)
+	{
+		if (this.unmountMessage) {
+			console.log("unhook:", node, prop, next);
+			Signal.sendMessage(this.unmountMessage);
+		}
+	};
+
 	function SoftSetHook(value)
 	{
 		if (!(this instanceof SoftSetHook))
@@ -1577,6 +1620,8 @@ Elm.Native.VirtualDom.make = function(elm)
 		node: node,
 		text: text,
 		on: F4(on),
+		onMount: onMount,
+		onUnmount: onUnmount,
 
 		property: F2(property),
 		attribute: F2(attribute),

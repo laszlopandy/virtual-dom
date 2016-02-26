@@ -4,6 +4,7 @@ module VirtualDom
     , toElement, fromElement
     , Property, property, attribute, attributeNS
     , on, onWithOptions, Options, defaultOptions
+    , onMount, onUnmount
     , lazy, lazy2, lazy3
     ) where
 
@@ -177,6 +178,13 @@ onWithOptions : String -> Options -> Json.Decoder a -> (a -> Signal.Message) -> 
 onWithOptions =
     Native.VirtualDom.on
 
+onMount : Signal.Message -> Property
+onMount =
+    Native.VirtualDom.onMount
+
+onUnmount : Signal.Message -> Property
+onUnmount =
+    Native.VirtualDom.onUnmount
 
 {-| Options for an event listener. If `stopPropagation` is true, it means the
 event stops traveling through the DOM so it will not trigger any other event
